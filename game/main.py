@@ -3,7 +3,7 @@ import time
 
 from reusableClasses.Vector2 import Vector2
 
-from game.game import Game
+from game import Game
 
 pygame.init()
 

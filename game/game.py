@@ -10,11 +10,11 @@ from reusableClasses.Vector2 import Vector2
 from reusableClasses.Collision import Collision
 from reusableClasses.Approach import Approach
 
-from game.player import Player
-from game.gun import Bullet
-from game.wall import Wall
+from player import Player
+from gun import Bullet
+from wall import Wall
 from wave import Wave
-from game.shopItem import ShopItem
+from shopItem import ShopItem
 
 
 class Game:
@@ -48,9 +48,9 @@ class Game:
 
         # SHOP ITEM IMAGE SIZE SHOULD BE 70x50
         self.bulletClipSize = ShopItem(1000, "images/clipSize.png", Vector2(240, 310), "+1 bullet")
-        self.healWall = ShopItem(2000, "images/healWall.png", Vector2(440, 310), "+20 wall health")
-        self.wallUpgrades = ShopItem(self.wall.wallUpgradesCost[self.wall.wallUpgradeIndex], "images/upgradeWall.png", Vector2(640, 310), "upgrade wall")
-        self.homingBullets = ShopItem(70000, "images/healWall.png", Vector2(840, 310), "homing bullets")
+        self.healWall = ShopItem(2000, "images/healWall.png", Vector2(470, 310), "+20 wall health")
+        self.wallUpgrades = ShopItem(self.wall.wallUpgradesCost[self.wall.wallUpgradeIndex], "images/upgradeWall.png", Vector2(680, 310), "upgrade wall")
+        self.homingBullets = ShopItem(70000, "images/homingBullets.png", Vector2(890, 310), "homing bullets")
 
         self.items = [self.bulletClipSize, self.healWall, self.wallUpgrades, self.homingBullets]
 
@@ -105,7 +105,7 @@ class Game:
         pygame.draw.line(screen, (100, 100, 100), beginningPoint, endingPoint, 15)
         # players guns bullets
         for bullet in self.player.gun.bullets:
-            pygame.draw.circle(screen, 'lime', (bullet.pos.x, bullet.pos.y), Bullet.radius)
+            pygame.draw.circle(screen, (186, 255, 0), (bullet.pos.x, bullet.pos.y), Bullet.radius)
         # wall
         pygame.draw.rect(screen, (26, 32, 38), (self.wall.pos.x, self.wall.pos.y, self.wall.width, self.wall.height))
         # enemies
@@ -141,7 +141,7 @@ class Game:
 
         # if the wave is finished draw shop, or if you lose draw losing screen
         if self.wave.inBetweenWaves or self.lose:
-            pygame.draw.rect(screen, (100, 100, 100), (100, 150, 1050, 600), 40)  # outside layer
+            pygame.draw.rect(screen, (100, 100, 100), (100, 150, 1050, 600))  # outside layer
             pygame.draw.rect(screen, (100, 100, 100), (100, 150, 1050, 100))  # top layer
             pygame.draw.rect(screen, (100, 100, 100), (100, 650, 1050, 100))  # bottom layer
             pygame.draw.rect(screen, (150, 150, 150), (140, 250, 970, 400))  # inside layer

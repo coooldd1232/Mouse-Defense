@@ -2,7 +2,7 @@ from reusableClasses.Vector2 import Vector2
 from reusableClasses.Collision import Collision
 from reusableClasses.Approach import Approach
 
-from game.gun import Gun
+from gun import Gun
 
 class Player:
     def __init__(self):
