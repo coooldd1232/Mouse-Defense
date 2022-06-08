@@ -35,7 +35,7 @@ while gameRunning:
         if event.type == pygame.MOUSEWHEEL:
             game.OnScroll(event.x, event.y)
 
-    game.Update(dt, mousePos, screen)
+    game.Update(dt, mousePos)
     game.Draw(screen)
 
     clock.tick(120)

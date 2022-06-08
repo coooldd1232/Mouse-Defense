@@ -37,7 +37,7 @@ class Game:
 
         self.wave = Wave()
         self.waveNumber = 0
-        self.waves = [[0, 0, 1], [5, 1, 1], [5, 3, 3], [5, 5, 5], [5, 10, 10], [5, 100, 100]]
+        self.waves = [[0, 2000, 1], [5, 1, 1], [5, 3, 3], [5, 5, 5], [5, 10, 10], [5, 100, 100]] # second for wave, tank enemies, fast enemies
 
         self.tankEnemies, self.fastEnemies = self.wave.Start(self.waves[self.waveNumber])
 
@@ -47,16 +47,17 @@ class Game:
         self.money = 0
 
         # SHOP ITEM IMAGE SIZE SHOULD BE 70x50
-        self.bulletClipSize = ShopItem(1000, "images/clipSize.png", Vector2(240, 310), "+1 bullet")
+        self.bulletClipSize = ShopItem(1000, "images/clipSize.png", Vector2(240, 310), "+1 clip size")
         self.healWall = ShopItem(2000, "images/healWall.png", Vector2(470, 310), "+20 wall health")
         self.wallUpgrades = ShopItem(self.wall.wallUpgradesCost[self.wall.wallUpgradeIndex], "images/upgradeWall.png", Vector2(680, 310), "upgrade wall")
         self.homingBullets = ShopItem(70000, "images/homingBullets.png", Vector2(890, 310), "homing bullets")
+        self.addAnotherBullet = ShopItem(20000, "images/clipSize.png", Vector2(240, 500), "+1 bullet")
 
-        self.items = [self.bulletClipSize, self.healWall, self.wallUpgrades, self.homingBullets]
+        self.items = [self.bulletClipSize, self.healWall, self.wallUpgrades, self.homingBullets, self.addAnotherBullet]
 
         self.lose = False
 
-    def Update(self, dt, mousePos, screen):
+    def Update(self, dt, mousePos):
         # if you haven't lost or are not in between a wave
         if self.wave.inBetweenWaves is False and self.lose is False:
             # update enemies
@@ -227,7 +228,12 @@ class Game:
                     if self.money >= self.homingBullets.cost and self.player.gun.homingBullets is False:
                         self.player.gun.homingBullets = True
                         self.homingBullets.canUpgrade = False
+                        self.money -= self.homingBullets.cost
                         self.homingBullets.SetCost(0)
+                elif Collision.PointOnRect(mousePos, self.addAnotherBullet.pos, self.addAnotherBullet.width, self.addAnotherBullet.height):
+                    if self.money >= self.addAnotherBullet.cost:
+                        self.player.gun.bulletsShootingPerClick += 1
+                        self.money -= self.addAnotherBullet.cost
 
         if self.lose:
             if button == 1:

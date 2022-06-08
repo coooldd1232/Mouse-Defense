@@ -21,12 +21,24 @@ class Gun:
 
         self.timeStartReload = 0
         self.reloadTime = 0.5
+        self.bulletsShootingPerClick = 1
 
         self.homingBullets = False
 
     def Shoot(self, direc):
-        if self.bulletsLeft > 0 and self.reloading is False:
-            self.bullets.append(Bullet(self.pos, direc))
+        if self.bulletsLeft > 0 and self.reloading is False: # if you are able to shoot
+            if self.bulletsShootingPerClick > 1:
+                highestAngle = direc.angle + math.radians(20)
+                lowestAngle = direc.angle - math.radians(20)
+
+                for bullet in range(self.bulletsShootingPerClick):
+                    bulletDirecAngle = (highestAngle - ((highestAngle - lowestAngle) / (self.bulletsShootingPerClick - 1)) * bullet)
+
+                    self.bullets.append(Bullet(self.pos, Vector2(math.cos(bulletDirecAngle), -math.sin(bulletDirecAngle))))
+            else:
+                self.bullets.append(Bullet(self.pos, direc))
+
+            
             self.bulletsLeft -= 1
 
     def Reload(self):
