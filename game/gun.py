@@ -72,6 +72,8 @@ class Gun:
                 if Collision.RectOnRect(bullet.pos - Vector2(bullet.radius, bullet.radius), Bullet.radius * 2, Bullet.radius * 2,
                                         enemy.pos, enemy.width, enemy.height):
 
+                    if bullet not in self.bullets:
+                        break
                     self.bullets.remove(bullet)
 
                     enemy.health -= 1

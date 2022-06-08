@@ -51,7 +51,7 @@ class Game:
         self.healWall = ShopItem(2000, "images/healWall.png", Vector2(470, 310), "+20 wall health")
         self.wallUpgrades = ShopItem(self.wall.wallUpgradesCost[self.wall.wallUpgradeIndex], "images/upgradeWall.png", Vector2(680, 310), "upgrade wall")
         self.homingBullets = ShopItem(70000, "images/homingBullets.png", Vector2(890, 310), "homing bullets")
-        self.addAnotherBullet = ShopItem(20000, "images/clipSize.png", Vector2(240, 500), "+1 bullet")
+        self.addAnotherBullet = ShopItem(20000, "images/anotherBullet.png", Vector2(240, 500), "+1 bullet")
 
         self.items = [self.bulletClipSize, self.healWall, self.wallUpgrades, self.homingBullets, self.addAnotherBullet]
 
@@ -108,7 +108,7 @@ class Game:
         for bullet in self.player.gun.bullets:
             pygame.draw.circle(screen, (186, 255, 0), (bullet.pos.x, bullet.pos.y), Bullet.radius)
         # wall
-        pygame.draw.rect(screen, (26, 32, 38), (self.wall.pos.x, self.wall.pos.y, self.wall.width, self.wall.height))
+        screen.blit(self.wall.wallUpgradesImages[0], (self.wall.pos.x, self.wall.pos.y))
         # enemies
         for enemy in self.tankEnemies:
             pygame.draw.rect(screen, (0, 0, 255), (enemy.pos.x, enemy.pos.y, enemy.width, enemy.height))
