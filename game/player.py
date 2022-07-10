@@ -16,7 +16,7 @@ class Player:
 
         self.gun = Gun(Vector2(self.pos.x + 20, self.pos.y + 25))
 
-    def Update(self, dt, mousePos, tankEnemies, fastEnemies):
+    def Update(self, dt, mousePos, fastEnemies):
         # update pos,velocity
         self.UpdateVelocity(dt)
         self.pos += self.vel * dt
@@ -29,18 +29,8 @@ class Player:
         self.gun.pos = Vector2(self.pos.x + 75, self.pos.y + 25)
 
         fastEnemiesDied = self.gun.Update(dt, mousePos, fastEnemies)
-        tankEnemiesDied = self.CheckForCollisionWithTankEnemies(tankEnemies)
 
-        return fastEnemiesDied, tankEnemiesDied
-
-    def CheckForCollisionWithTankEnemies(self, enemies):
-        tankEnemiesDied = 0
-        for enemy in enemies:
-            if Collision.RectOnRect(self.pos, self.width, self.height, enemy.pos, enemy.width, enemy.height):
-                enemies.remove(enemy)
-                tankEnemiesDied += 1
-
-        return tankEnemiesDied
+        return fastEnemiesDied
 
     def UpdateVelocity(self, dt):
         self.vel.y = Approach(self.velGoal.y, self.vel.y, dt * 40)
