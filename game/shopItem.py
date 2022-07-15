@@ -26,7 +26,7 @@ class ShopItem:
 
         self.textDescription = self.font.render(textDescription, True, (0, 76, 76))
         self.textDescriptionRect = self.textDescription.get_rect()
-        self.textDescriptionRect.center = self.pos.x + self.width/2 - 5, self.pos.y - 20
+        self.textDescriptionRect.center = self.pos.x + self.width / 2 - 5, self.pos.y - 20
 
     def SetCost(self, cost):
         self.cost = cost

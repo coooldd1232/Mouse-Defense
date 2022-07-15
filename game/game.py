@@ -12,9 +12,9 @@ from reusableClasses.Approach import Approach
 from player import Player
 from gun import Bullet
 from wall import Wall
-from powers import Freeze
 from wave import Wave
 from shopItem import ShopItem
+from powers import *
 
 
 class Game:
@@ -35,7 +35,7 @@ class Game:
 
         self.wave = Wave()
         self.waveNumber = 0
-        self.waves = [[0, 1], [5, 2], [5, 3], [5, 5], [5, 10], [5, 100]] # seconds per wave, fast enemies
+        self.waves = [[3, 2], [5, 5], [5, 10], [3, 5], [0, 7], [50, 100], [50, 200], [25, 300], [25, 500]] # seconds per wave, fast enemies
 
         self.fastEnemies = self.wave.Start(self.waves[self.waveNumber])
 
@@ -46,35 +46,42 @@ class Game:
 
         # upgrades
         # image should be 70x50
-        self.bulletClipSize = ShopItem(1000, "images/upgrades/clipSize.png", Vector2(220, 350), "+1 clip size", 70, 50)
-        self.healWall = ShopItem(2000, "images/upgrades/healWall.png", Vector2(430, 350), "+20 wall health", 70, 50)
-        self.wallUpgrades = ShopItem(self.wall.wallUpgradesCost[self.wall.wallUpgradeIndex], "images/upgrades/upgradeWall.png", Vector2(620, 350), "upgrade wall", 70, 50)
-        self.homingBullets = ShopItem(70000, "images/upgrades/homingBullets.png", Vector2(800, 350), "homing bullets", 70, 50)
-        self.addAnotherBullet = ShopItem(20000, "images/upgrades/anotherBullet.png", Vector2(990, 350), "+1 bullet", 70, 50)
+        self.bulletClipSize   = ShopItem(100, "images/upgrades/clipSize.png", Vector2(220, 350), "+1 clip size", 70, 50)
+        self.healWall         = ShopItem(200, "images/upgrades/healWall.png", Vector2(430, 350), "+20 wall health", 70, 50)
+        self.wallUpgrades     = ShopItem(self.wall.wallUpgradesCost[self.wall.wallUpgradeIndex], "images/upgrades/upgradeWall.png", Vector2(620, 350), "upgrade wall", 70, 50)
+        self.homingBullets    = ShopItem(20000, "images/upgrades/homingBullets.png", Vector2(800, 350), "homing bullets", 70, 50)
+        self.addAnotherBullet = ShopItem(5000, "images/upgrades/anotherBullet.png", Vector2(990, 350), "+1 bullet", 70, 50)
         # powers
         # image should be 50x50
-        self.freezePower = ShopItem(0, "images/powers/freeze.png", Vector2(220, 520), "freeze enemies", 50, 50)
+        self.freezePower = ShopItem(2000, "images/powers/freeze.png", Vector2(220, 520), "freeze", 50, 50)
+        self.clearPower  = ShopItem(10000, "images/powers/powerPunch.png", Vector2(430, 520), "clear", 50, 50)
 
-        self.upgrades = [self.bulletClipSize, self.healWall, self.wallUpgrades, self.homingBullets, self.addAnotherBullet]
-        self.listOfPowers = [self.freezePower]
+        self.upgrades     = [self.bulletClipSize, self.healWall, self.wallUpgrades, self.homingBullets, self.addAnotherBullet]
+        self.listOfPowers = [self.freezePower, self.clearPower]
 
         self.FREEZEPOWER = 0
+        self.CLEARPOWER  = 1
 
         self.ownedPowers = []
 
-        self.freezeStruct = Freeze()
+        self.freezeClass = Freeze()
+        self.clearClass = Clear()
 
         self.lose = False
 
     def Update(self, dt, mousePos):
         # if you haven't lost or are not in between a wave
         if self.wave.inBetweenWaves is False and self.lose is False:
-            if self.freezeStruct.freezing and time.time() - self.freezeStruct.timeStartedFreezing > self.freezeStruct.TIMETOFREEZEFOR:
-                self.freezeStruct.freezing = False
+            # if you are freezing time is up
+            if self.freezeClass.freezing and time.time() - self.freezeClass.timeStartedFreezing > self.freezeClass.TIMETOFREEZEFOR:
+                self.freezeClass.freezing = False
+            if self.clearClass.clearing:
+                self.clearClass.Update(dt * 700, self.fastEnemies) # 700 is speed of clear
             # update enemies
             for enemy in self.fastEnemies:
-                self.wall.health -= enemy.Update(dt * 60, self.wall.pos, self.freezeStruct.freezing)
+                self.wall.health -= enemy.Update(dt * 60, self.wall.pos, self.freezeClass.freezing)
 
+            # if you die
             if self.wall.health <= 0:
                 self.lose = True
 
@@ -91,6 +98,8 @@ class Game:
             if self.fastEnemies == [] and self.lose is False:
                 self.wave.inBetweenWaves = True
                 self.player.gun.bullets = []
+                self.freezeClass.Reset()
+                self.clearClass.Reset()
 
         if self.lose:
             self.playAgainButton.Update(mousePos)
@@ -108,6 +117,9 @@ class Game:
         # background
         screen.fill((0, 0, 0))
 
+        # draw clearing
+        if self.clearClass.clearing:
+            screen.blit(self.clearClass.image, (self.clearClass.pos.x, self.clearClass.pos.y))
         # player
         pygame.draw.rect(screen, (200, 200, 200), (self.player.pos.x, self.player.pos.y, self.player.width, self.player.height))
         # players gun
@@ -193,7 +205,7 @@ class Game:
                 for power in self.listOfPowers:
                     screen.blit(power.image, power.GetRect())
                     screen.blit(power.textCost, power.textCostRect)
-                    screen.blit(power.textDescription, upgrade.textDescriptionRect)
+                    screen.blit(power.textDescription, power.textDescriptionRect)
 
             elif self.lose:
                 youLoseText = self.font.render(f'and made it to wave: {self.waveNumber + 1}', True, (200, 80, 0))
@@ -215,9 +227,13 @@ class Game:
             if button == 2:
                 if len(self.ownedPowers) > 0:
                     powerUsed = 0
+
                     if self.ownedPowers[powerUsed] == self.FREEZEPOWER:
-                        self.freezeStruct.freezing = True
-                        self.freezeStruct.timeStartedFreezing = time.time()
+                        self.freezeClass.freezing = True
+                        self.freezeClass.timeStartedFreezing = time.time()
+
+                    elif self.ownedPowers[powerUsed] == self.CLEARPOWER:
+                        self.clearClass.Start()
 
                     self.ownedPowers.pop(powerUsed)
 
@@ -273,7 +289,14 @@ class Game:
                         self.money -= self.addAnotherBullet.cost
                 # if you click on Freeze Power:
                 elif Collision.PointOnRect(mousePos, self.freezePower.pos, self.freezePower.width, self.freezePower.height):
-                    self.ownedPowers.append(self.FREEZEPOWER)
+                    if self.money >= self.freezePower.cost:
+                        self.money -= self.freezePower.cost
+                        self.ownedPowers.append(self.FREEZEPOWER)
+                # if you click on clear Power:
+                elif Collision.PointOnRect(mousePos, self.clearPower.pos, self.clearPower.width, self.clearPower.height):
+                    if self.money >= self.clearPower.cost:
+                        self.money -= self.clearPower.cost
+                    self.ownedPowers.append(self.CLEARPOWER)
 
         if self.lose:
             if button == 1:

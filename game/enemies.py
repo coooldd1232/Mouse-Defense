@@ -2,6 +2,7 @@ import random
 import time
 
 from reusableClasses.Vector2 import Vector2
+from reusableClasses.Collision import Collision
 
 class FastEnemy:
     def __init__(self, timeToMove):
@@ -39,6 +40,7 @@ class FastEnemy:
                 self.pos += self.vel * dt
 
         if self.pos.x + self.width > wallPos.x:
+            self.pos.x = wallPos.x - self.width
             self.moving = False
             self.attacking = True
 
